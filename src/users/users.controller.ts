@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,7 +18,11 @@ export class UsersController {
 
   @Post('create-new-user')
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    try {
+      return this.usersService.create(createUserDto);
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 
   @Get('/get-all-user')
@@ -35,8 +40,12 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('/delete-user/:id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    try {
+      return this.usersService.remove(+id);
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 }
