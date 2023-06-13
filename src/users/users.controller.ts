@@ -27,17 +27,25 @@ export class UsersController {
 
   @Get('/get-all-user')
   findAll() {
-    return this.usersService.findAll();
+    try {
+      return this.usersService.findAll();
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 
-  @Get(':id')
+  @Get('/get-user-by-id/:id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    try {
+      return this.usersService.findOne(id);
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete('/delete-user/:id')

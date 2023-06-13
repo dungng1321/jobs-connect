@@ -1,14 +1,20 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { hashPassword } from 'src/util/hashPassword';
 import {
   MESSAGE_ERROR,
   MESSAGE_SUCCESS,
 } from 'src/constants/constants.message';
+import { ResponseData } from 'src/constants/ReponseData';
+import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
 
 @Injectable()
 export class UsersService {
@@ -31,22 +37,37 @@ export class UsersService {
 
     const data = newUser.toObject();
 
-    return {
-      statusCode: 200,
-      message: MESSAGE_SUCCESS.CREATE_NEW_USER_SUCCESS,
+    return new ResponseData(
+      HTTP_STATUS.CREATED,
+      MESSAGE_SUCCESS.CREATE_NEW_USER_SUCCESS,
       data,
-    };
+    );
   }
 
-  findAll() {
-    return `This action returns all users`;
+  // get all user
+  async findAll() {
+    const users = await this.userModel.find();
+    const data = users.map((user) => user.toObject());
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  // get user by id
+  async findOne(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const data = user.toObject();
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
