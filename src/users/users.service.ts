@@ -67,11 +67,31 @@ export class UsersService {
     return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  // update user
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const data = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+      new: true,
+    });
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  // delete user
+  async remove(id: string) {
+    if (!isValidObjectId(id) || !(await this.userModel.findById(id))) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const data = await this.userModel.findByIdAndDelete(id);
+
+    return new ResponseData(
+      HTTP_STATUS.OK,
+      MESSAGE_SUCCESS.DELETE_USER_SUCCESS,
+      data,
+    );
   }
 }

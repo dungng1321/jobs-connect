@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MESSAGE_ERROR } from 'src/constants/constants.message';
 
 @Controller('users')
 export class UsersController {
@@ -43,17 +44,21 @@ export class UsersController {
     }
   }
 
-  @Patch(':id')
+  @Patch('/update-user/:id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+    try {
+      return this.usersService.update(id, updateUserDto);
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 
   @Delete('/delete-user/:id')
   remove(@Param('id') id: string) {
     try {
-      return this.usersService.remove(+id);
+      return this.usersService.remove(id);
     } catch (err) {
-      throw new HttpException(err.message, err.statusCode);
+      throw new HttpException(MESSAGE_ERROR.DELETE_USER_FAIL, err.statusCode);
     }
   }
 }
