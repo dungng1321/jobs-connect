@@ -67,6 +67,18 @@ export class UsersService {
     return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
+  // find user by username
+  async findByUsername(username: string) {
+    const user = await this.userModel.findOne({ email: username });
+    if (!user) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const data = user.toObject();
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
+  }
+
   // update user
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (!isValidObjectId(id)) {
