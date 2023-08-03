@@ -7,7 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model, isValidObjectId } from 'mongoose';
+import { isValidObjectId } from 'mongoose';
+
 import { hashPassword } from 'src/util/hashPassword';
 import {
   MESSAGE_ERROR,
@@ -15,10 +16,14 @@ import {
 } from 'src/constants/constants.message';
 import { ResponseData } from 'src/constants/ReponseData';
 import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+  ) {}
 
   // create new user width async await
   async create(createUserDto: CreateUserDto) {
@@ -98,7 +103,9 @@ export class UsersService {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
 
-    const data = await this.userModel.findByIdAndDelete(id);
+    const data = await this.userModel.softDelete({
+      _id: id,
+    });
 
     return new ResponseData(
       HTTP_STATUS.OK,

@@ -13,6 +13,9 @@ async function bootstrap() {
   // enable guard global
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
+
+  // config cors
+  app.enableCors();
   const port = configService.get('PORT');
   await app.listen(port);
 }
