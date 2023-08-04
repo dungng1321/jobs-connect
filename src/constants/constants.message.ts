@@ -9,4 +9,6 @@ export const MESSAGE_SUCCESS = {
   SUCCESS: 'Success',
   UPDATE_USER_SUCCESS: 'Update user success',
   DELETE_USER_SUCCESS: 'Delete user success',
+
+  CREATE_NEW_COMPANY_SUCCESS: 'Create new company success',
 };

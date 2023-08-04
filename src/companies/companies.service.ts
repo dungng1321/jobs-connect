@@ -5,14 +5,26 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Company } from './schemas/company.schema';
 import { Model } from 'mongoose';
 import { CompanyDocument } from './schemas/company.schema';
+import { ResponseData } from 'src/constants/ReponseData';
+import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
+import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
   ) {}
-  create(createCompanyDto: CreateCompanyDto) {
-    return 'This action adds a new company';
+
+  // create new company
+  async create(createCompanyDto: CreateCompanyDto) {
+    const newCompany = await this.companyModel.create(createCompanyDto);
+    const data = newCompany.toObject();
+
+    return new ResponseData(
+      HTTP_STATUS.CREATED,
+      MESSAGE_SUCCESS.CREATE_NEW_COMPANY_SUCCESS,
+      data,
+    );
   }
 
   findAll() {
