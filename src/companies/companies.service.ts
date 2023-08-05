@@ -8,6 +8,8 @@ import { CompanyDocument } from './schemas/company.schema';
 import { ResponseData } from 'src/constants/ReponseData';
 import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
+import { IUser } from 'src/users/interface/user.interface';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class CompaniesService {
@@ -16,9 +18,16 @@ export class CompaniesService {
   ) {}
 
   // create new company
-  async create(createCompanyDto: CreateCompanyDto) {
-    const newCompany = await this.companyModel.create(createCompanyDto);
-    const data = newCompany.toObject();
+  async create(createCompanyDto: CreateCompanyDto, user: IUser) {
+    const newCompany = this.companyModel.create({
+      ...createCompanyDto,
+      createdBy: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+    const data = await newCompany;
 
     return new ResponseData(
       HTTP_STATUS.CREATED,

@@ -3,6 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/schemas/user.schema';
 import { comparePassword } from 'src/util/hashPassword';
 import { JwtService } from '@nestjs/jwt';
+import { IUser } from 'src/users/interface/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -20,10 +21,21 @@ export class AuthService {
     }
   }
 
-  async login(user: any) {
-    const payload = { username: user.email, sub: user._id };
+  async login(user: IUser) {
+    const { _id, name, email, role } = user;
+    const payload = {
+      sub: 'token login system',
+      _id,
+      name,
+      email,
+      role,
+    };
     return {
       access_token: this.jwtService.sign(payload),
+      _id,
+      name,
+      email,
+      role,
     };
   }
 }

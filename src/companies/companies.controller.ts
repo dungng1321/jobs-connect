@@ -11,15 +11,17 @@ import {
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { User } from 'src/decorator/customize';
+import { IUser } from 'src/users/interface/user.interface';
 
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
   @Post('create-new-company')
-  create(@Body() createCompanyDto: CreateCompanyDto) {
+  create(@Body() createCompanyDto: CreateCompanyDto, @User() user: IUser) {
     try {
-      return this.companiesService.create(createCompanyDto);
+      return this.companiesService.create(createCompanyDto, user);
     } catch (err) {
       throw new HttpException(err.message, err.statusCode);
     }

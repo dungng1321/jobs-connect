@@ -14,13 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const expirationGMTPlus7 = new Date(
-      payload.exp * 1000 + 7 * 60 * 60 * 1000,
-    ).toISOString();
-    return {
-      userId: payload.sub,
-      username: payload.username,
-      expiration: expirationGMTPlus7,
-    };
+    const { sub, _id, name, email, role } = payload;
+    return { sub, _id, name, email, role };
   }
 }
