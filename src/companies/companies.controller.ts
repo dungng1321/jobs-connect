@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -27,16 +28,31 @@ export class CompaniesController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.companiesService.findAll();
+  // get all company with pagination and search
+  @Get('/get-all-company')
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('q') queryString: string,
+  ) {
+    try {
+      return this.companiesService.findAll(page, limit, queryString);
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
+    }
   }
 
-  @Get(':id')
+  // get company by id
+  @Get('/get-company/:id')
   findOne(@Param('id') id: string) {
-    return this.companiesService.findOne(+id);
+    try {
+      return this.companiesService.findOne(id);
+    } catch (err) {
+      throw new HttpException(err.message, err.statusCode);
+    }
   }
 
+  // update company by id
   @Patch('/update-company/:id')
   update(
     @Param('id') id: string,

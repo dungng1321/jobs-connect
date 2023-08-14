@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Query,
   Delete,
   HttpException,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { MESSAGE_ERROR } from 'src/constants/constants.message';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // create new user
   @Post('create-new-user')
   create(@Body() createUserDto: CreateUserDto) {
     try {
@@ -26,15 +28,21 @@ export class UsersController {
     }
   }
 
+  // get all user with pagination and search
   @Get('/get-all-user')
-  findAll() {
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('search') queryString: string,
+  ) {
     try {
-      return this.usersService.findAll();
+      return this.usersService.findAll(page, limit, queryString);
     } catch (err) {
       throw new HttpException(err.message, err.statusCode);
     }
   }
 
+  // get user by id
   @Get('/get-user-by-id/:id')
   findOne(@Param('id') id: string) {
     try {
@@ -44,6 +52,7 @@ export class UsersController {
     }
   }
 
+  // update user by id
   @Patch('/update-user/:id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
@@ -53,6 +62,7 @@ export class UsersController {
     }
   }
 
+  // delete user by id
   @Delete('/delete-user/:id')
   remove(@Param('id') id: string) {
     try {

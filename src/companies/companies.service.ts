@@ -13,6 +13,7 @@ import {
 import { IUser } from 'src/users/interface/user.interface';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { User } from 'src/decorator/customize';
+import qs from 'qs';
 
 @Injectable()
 export class CompaniesService {
@@ -40,12 +41,54 @@ export class CompaniesService {
     );
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  // get all company with pagination and search
+  async findAll(page: number, limit: number, queryString: string) {
+    const searchQuery: any = qs.parse(queryString);
+
+    const { name, address } = searchQuery;
+
+    if (name) searchQuery.name = { $regex: name, $options: 'i' };
+    if (address) searchQuery.address = { $regex: address, $options: 'i' };
+
+    const totalCompany = await this.companyModel.countDocuments(searchQuery);
+
+    let dataQuery = this.companyModel.find(searchQuery);
+
+    if (page && limit) {
+      const skip = limit * (page - 1);
+      dataQuery = dataQuery.skip(skip).limit(limit);
+    }
+
+    const data = await dataQuery;
+    const responseMeta = {
+      currentPage: page || 1,
+      totalUserInPage: data.length,
+      totalUser: totalCompany,
+      TotalPage: limit ? Math.ceil(totalCompany / limit) : 1,
+      limit: limit || totalCompany,
+    };
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, {
+      meta: responseMeta,
+      data: data,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  // get company by id
+  async findOne(id: string) {
+    if (!isValidObjectId(id) || !(await this.companyModel.findById(id))) {
+      throw new NotFoundException(MESSAGE_ERROR.COMPANY_NOT_FOUND);
+    }
+
+    const company = await this.companyModel.findById(id);
+
+    if (!company) {
+      throw new NotFoundException(MESSAGE_ERROR.COMPANY_NOT_FOUND);
+    }
+
+    const data = company.toObject();
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
   }
 
   // update company by id

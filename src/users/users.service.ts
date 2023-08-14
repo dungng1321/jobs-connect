@@ -18,6 +18,7 @@ import { ResponseData } from 'src/constants/ReponseData';
 import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { UserDocument } from './schemas/user.schema';
+import qs from 'qs';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
   ) {}
 
-  // create new user width async await
+  // create new user
   async create(createUserDto: CreateUserDto) {
     const { password, ...rest } = createUserDto;
 
@@ -34,7 +35,7 @@ export class UsersService {
       throw new BadRequestException(MESSAGE_ERROR.EMAIL_EXIST);
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = hashPassword(password);
     const newUser = await this.userModel.create({
       ...rest,
       password: hashedPassword,
@@ -49,12 +50,38 @@ export class UsersService {
     );
   }
 
-  // get all user
-  async findAll() {
-    const users = await this.userModel.find();
-    const data = users.map((user) => user.toObject());
+  // get all user with pagination and search
+  async findAll(page: number, limit: number, queryString: string) {
+    const searchQuery: any = qs.parse(queryString);
 
-    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
+    const { age, name, address, email } = searchQuery;
+
+    if (age) searchQuery.age = +age;
+    if (name) searchQuery.name = { $regex: name, $options: 'i' };
+    if (address) searchQuery.address = { $regex: address, $options: 'i' };
+    if (email) searchQuery.email = { $regex: email, $options: 'i' };
+
+    const totalUser = await this.userModel.countDocuments(searchQuery);
+
+    let dataQuery = this.userModel.find(searchQuery);
+    if (page && limit) {
+      const skip = (page - 1) * limit;
+      dataQuery = dataQuery.skip(skip).limit(limit);
+    }
+
+    const data = await dataQuery;
+    const responseMeta = {
+      currentPage: page || 1,
+      totalUserInPage: data.length,
+      totalUser: totalUser,
+      TotalPage: limit ? Math.ceil(totalUser / limit) : 1,
+      limit: limit || totalUser,
+    };
+
+    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, {
+      meta: responseMeta,
+      data: data,
+    });
   }
 
   // get user by id
