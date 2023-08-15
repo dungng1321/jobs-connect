@@ -10,12 +10,7 @@ import { User } from './schemas/user.schema';
 import { isValidObjectId } from 'mongoose';
 
 import { hashPassword } from 'src/util/hashPassword';
-import {
-  MESSAGE_ERROR,
-  MESSAGE_SUCCESS,
-} from 'src/constants/constants.message';
-import { ResponseData } from 'src/constants/ReponseData';
-import { HTTP_STATUS } from 'src/constants/httpStatusEnum';
+import { MESSAGE_ERROR } from 'src/constants/constants.message';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { UserDocument } from './schemas/user.schema';
 import qs from 'qs';
@@ -43,27 +38,24 @@ export class UsersService {
 
     const data = newUser.toObject();
 
-    return new ResponseData(
-      HTTP_STATUS.CREATED,
-      MESSAGE_SUCCESS.CREATE_NEW_USER_SUCCESS,
-      data,
-    );
+    return data;
   }
 
-  // get all user with pagination and search
+  // get all user with pagination and filter
   async findAll(page: number, limit: number, queryString: string) {
-    const searchQuery: any = qs.parse(queryString);
+    const searchQuery = qs.parse(queryString, { ignoreQueryPrefix: true });
 
     const { age, name, address, email } = searchQuery;
+    const filter: any = {};
 
-    if (age) searchQuery.age = +age;
-    if (name) searchQuery.name = { $regex: name, $options: 'i' };
-    if (address) searchQuery.address = { $regex: address, $options: 'i' };
-    if (email) searchQuery.email = { $regex: email, $options: 'i' };
+    if (age) filter.age = +age;
+    if (name) filter.name = { $regex: name, $options: 'i' };
+    if (address) filter.address = { $regex: address, $options: 'i' };
+    if (email) filter.email = { $regex: email, $options: 'i' };
 
-    const totalUser = await this.userModel.countDocuments(searchQuery);
+    const totalUser = await this.userModel.countDocuments(filter);
 
-    let dataQuery = this.userModel.find(searchQuery);
+    let dataQuery = this.userModel.find(filter);
     if (page && limit) {
       const skip = (page - 1) * limit;
       dataQuery = dataQuery.skip(skip).limit(limit);
@@ -78,10 +70,10 @@ export class UsersService {
       limit: limit || totalUser,
     };
 
-    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, {
+    return {
       meta: responseMeta,
       data: data,
-    });
+    };
   }
 
   // get user by id
@@ -95,8 +87,7 @@ export class UsersService {
     }
 
     const data = user.toObject();
-
-    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
+    return data;
   }
 
   // find user by username
@@ -108,12 +99,12 @@ export class UsersService {
 
     const data = user.toObject();
 
-    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
+    return data;
   }
 
   // update user
   async update(id: string, updateUserDto: UpdateUserDto) {
-    if (!isValidObjectId(id)) {
+    if (!isValidObjectId(id) || !(await this.userModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
 
@@ -121,7 +112,7 @@ export class UsersService {
       new: true,
     });
 
-    return new ResponseData(HTTP_STATUS.OK, MESSAGE_SUCCESS.SUCCESS, data);
+    return data;
   }
 
   // delete user
@@ -134,10 +125,6 @@ export class UsersService {
       _id: id,
     });
 
-    return new ResponseData(
-      HTTP_STATUS.OK,
-      MESSAGE_SUCCESS.DELETE_USER_SUCCESS,
-      data,
-    );
+    return data;
   }
 }

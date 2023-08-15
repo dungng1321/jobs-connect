@@ -15,3 +15,8 @@ export const User = createParamDecorator(
     return request.user;
   },
 );
+
+// Decorator function to set metadata for response message
+export const RESPONSE_MESSAGE = 'response_message';
+export const ResponseMessage = (message: string) =>
+  SetMetadata(RESPONSE_MESSAGE, message);

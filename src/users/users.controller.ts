@@ -12,7 +12,11 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { MESSAGE_ERROR } from 'src/constants/constants.message';
+import {
+  MESSAGE_ERROR,
+  MESSAGE_SUCCESS,
+} from 'src/constants/constants.message';
+import { ResponseMessage } from 'src/decorator/customize';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +24,7 @@ export class UsersController {
 
   // create new user
   @Post('create-new-user')
+  @ResponseMessage(MESSAGE_SUCCESS.CREATE_NEW_USER_SUCCESS)
   create(@Body() createUserDto: CreateUserDto) {
     try {
       return this.usersService.create(createUserDto);
@@ -30,10 +35,11 @@ export class UsersController {
 
   // get all user with pagination and search
   @Get('/get-all-user')
+  @ResponseMessage(MESSAGE_SUCCESS.GET_USERS_SUCCESS)
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('search') queryString: string,
+    @Query() queryString: string,
   ) {
     try {
       return this.usersService.findAll(page, limit, queryString);
@@ -44,6 +50,7 @@ export class UsersController {
 
   // get user by id
   @Get('/get-user-by-id/:id')
+  @ResponseMessage(MESSAGE_SUCCESS.GET_USER_SUCCESS)
   findOne(@Param('id') id: string) {
     try {
       return this.usersService.findOne(id);
@@ -54,6 +61,7 @@ export class UsersController {
 
   // update user by id
   @Patch('/update-user/:id')
+  @ResponseMessage(MESSAGE_SUCCESS.UPDATE_USER_SUCCESS)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
       return this.usersService.update(id, updateUserDto);
@@ -64,6 +72,7 @@ export class UsersController {
 
   // delete user by id
   @Delete('/delete-user/:id')
+  @ResponseMessage(MESSAGE_SUCCESS.DELETE_USER_SUCCESS)
   remove(@Param('id') id: string) {
     try {
       return this.usersService.remove(id);

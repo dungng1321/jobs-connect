@@ -9,13 +9,19 @@ export const MESSAGE_ERROR = {
 };
 
 export const MESSAGE_SUCCESS = {
+  SUCCESS: 'Success',
+
   // user
   CREATE_NEW_USER_SUCCESS: 'Create new user success',
-  SUCCESS: 'Success',
   UPDATE_USER_SUCCESS: 'Update user success',
+  GET_USER_SUCCESS: 'Get user success',
+  GET_USERS_SUCCESS: 'Get users success',
   DELETE_USER_SUCCESS: 'Delete user success',
 
   // company
   CREATE_NEW_COMPANY_SUCCESS: 'Create new company success',
   UPDATE_COMPANY_SUCCESS: 'Update company success',
+  GET_COMPANY_SUCCESS: 'Get company success',
+  GET_COMPANIES_SUCCESS: 'Get companies success',
+  DELETE_COMPANY_SUCCESS: 'Delete company success',
 };
