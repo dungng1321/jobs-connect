@@ -13,6 +13,7 @@ export const MESSAGE_SUCCESS = {
 
   // user
   CREATE_NEW_USER_SUCCESS: 'Create new user success',
+  REGISTER_NEW_USER_SUCCESS: 'Register new user success',
   UPDATE_USER_SUCCESS: 'Update user success',
   GET_USER_SUCCESS: 'Get user success',
   GET_USERS_SUCCESS: 'Get users success',

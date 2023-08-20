@@ -9,7 +9,7 @@ export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true); // Decorator function key: value
 
 // Decorator function to get user info from request
-export const User = createParamDecorator(
+export const RequestUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
     return request.user;

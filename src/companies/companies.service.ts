@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCompanyDto } from './dto/create-company.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId } from 'mongoose';
-import { CompanyDocument, Company } from './schemas/company.schema';
-import { MESSAGE_ERROR } from 'src/constants/constants.message';
-import { IUser } from 'src/users/interface/user.interface';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { User } from 'src/decorator/customize';
 import qs from 'qs';
+
+import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import { CompanyDocument, Company } from './schemas/company.schema';
+import { IUser } from 'src/users/interface/user.interface';
+import { RequestUser } from 'src/decorator/customize';
+import { MESSAGE_ERROR } from 'src/constants/constants.message';
 
 @Injectable()
 export class CompaniesService {
@@ -18,7 +19,7 @@ export class CompaniesService {
   ) {}
 
   // create new company
-  async create(createCompanyDto: CreateCompanyDto, user: IUser) {
+  async create(createCompanyDto: CreateCompanyDto, @RequestUser() user: IUser) {
     const newCompany = await this.companyModel.create({
       ...createCompanyDto,
       createdBy: {
@@ -88,28 +89,28 @@ export class CompaniesService {
   }
 
   // update company by id
-  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
+  async update(
+    id: string,
+    updateCompanyDto: UpdateCompanyDto,
+    @RequestUser() user: IUser,
+  ) {
     if (!isValidObjectId(id) || !(await this.companyModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.COMPANY_NOT_FOUND);
     }
 
-    const data = await this.companyModel.findByIdAndUpdate(
-      id,
-      {
-        ...updateCompanyDto,
-        updatedBy: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-        },
+    const data = await this.companyModel.findByIdAndUpdate(id, {
+      ...updateCompanyDto,
+      updatedBy: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
       },
-      { new: true },
-    );
+    });
 
     return data;
   }
 
-  async remove(id: string, @User() user: IUser) {
+  async remove(id: string, @RequestUser() user: IUser) {
     if (!isValidObjectId(id) || !(await this.companyModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.COMPANY_NOT_FOUND);
     }
@@ -128,7 +129,7 @@ export class CompaniesService {
     );
 
     // use soft delete
-    const data = await this.companyModel.softDelete({
+    const data = this.companyModel.softDelete({
       _id: id,
     });
 

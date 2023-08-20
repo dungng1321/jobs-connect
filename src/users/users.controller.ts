@@ -16,7 +16,8 @@ import {
   MESSAGE_ERROR,
   MESSAGE_SUCCESS,
 } from 'src/constants/constants.message';
-import { ResponseMessage } from 'src/decorator/customize';
+import { ResponseMessage, RequestUser } from 'src/decorator/customize';
+import { IUser } from './interface/user.interface';
 
 @Controller('users')
 export class UsersController {
@@ -25,9 +26,9 @@ export class UsersController {
   // create new user
   @Post('create-new-user')
   @ResponseMessage(MESSAGE_SUCCESS.CREATE_NEW_USER_SUCCESS)
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto, @RequestUser() user: IUser) {
     try {
-      return this.usersService.create(createUserDto);
+      return this.usersService.create(createUserDto, user);
     } catch (err) {
       throw new HttpException(err.message, err.statusCode);
     }
@@ -62,9 +63,13 @@ export class UsersController {
   // update user by id
   @Patch('/update-user/:id')
   @ResponseMessage(MESSAGE_SUCCESS.UPDATE_USER_SUCCESS)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @RequestUser() user: IUser,
+  ) {
     try {
-      return this.usersService.update(id, updateUserDto);
+      return this.usersService.update(id, updateUserDto, user);
     } catch (err) {
       throw new HttpException(err.message, err.statusCode);
     }
@@ -73,9 +78,9 @@ export class UsersController {
   // delete user by id
   @Delete('/delete-user/:id')
   @ResponseMessage(MESSAGE_SUCCESS.DELETE_USER_SUCCESS)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string, @RequestUser() user: IUser) {
     try {
-      return this.usersService.remove(id);
+      return this.usersService.remove(id, user);
     } catch (err) {
       throw new HttpException(MESSAGE_ERROR.DELETE_USER_FAIL, err.statusCode);
     }

@@ -3,17 +3,19 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/user.schema';
+import qs from 'qs';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { isValidObjectId } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 import { hashPassword } from 'src/util/hashPassword';
 import { MESSAGE_ERROR } from 'src/constants/constants.message';
-import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { UserDocument } from './schemas/user.schema';
-import qs from 'qs';
+import { IUser } from './interface/user.interface';
+import { RequestUser } from 'src/decorator/customize';
+import { Position } from 'src/constants/positionEnum';
 
 @Injectable()
 export class UsersService {
@@ -21,8 +23,8 @@ export class UsersService {
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
   ) {}
 
-  // create new user
-  async create(createUserDto: CreateUserDto) {
+  // create new user by admin
+  async create(createUserDto: CreateUserDto, @RequestUser() user: IUser) {
     const { password, ...rest } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ email: rest.email });
@@ -34,10 +36,35 @@ export class UsersService {
     const newUser = await this.userModel.create({
       ...rest,
       password: hashedPassword,
+      createdBy: {
+        _id: user._id,
+        name: user.name,
+      },
     });
 
-    const data = newUser.toObject();
+    // retutn user without password , select('-password')
+    const data = await this.userModel.findById(newUser._id).select('-password');
 
+    return data;
+  }
+
+  // register user
+  async register(registerUserDto: RegisterUserDto) {
+    const { password, ...rest } = registerUserDto;
+
+    const existingUser = await this.userModel.findOne({ email: rest.email });
+    if (existingUser) {
+      throw new BadRequestException(MESSAGE_ERROR.EMAIL_EXIST);
+    }
+
+    const hashedPassword = hashPassword(password);
+    const newUser = await this.userModel.create({
+      role: Position.USER,
+      password: hashedPassword,
+      ...rest,
+    });
+
+    const data = await this.userModel.findById(newUser._id).select('-password');
     return data;
   }
 
@@ -55,7 +82,7 @@ export class UsersService {
 
     const totalUser = await this.userModel.countDocuments(filter);
 
-    let dataQuery = this.userModel.find(filter);
+    let dataQuery = this.userModel.find(filter).select('-password');
     if (page && limit) {
       const skip = (page - 1) * limit;
       dataQuery = dataQuery.skip(skip).limit(limit);
@@ -72,7 +99,7 @@ export class UsersService {
 
     return {
       meta: responseMeta,
-      data: data,
+      data,
     };
   }
 
@@ -81,7 +108,7 @@ export class UsersService {
     if (!isValidObjectId(id)) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).select('-password');
     if (!user) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
@@ -103,24 +130,42 @@ export class UsersService {
   }
 
   // update user
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    @RequestUser() user: IUser,
+  ) {
     if (!isValidObjectId(id) || !(await this.userModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
 
-    const data = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      new: true,
-    });
-
+    const data = await this.userModel
+      .findByIdAndUpdate(id, {
+        ...updateUserDto,
+        createBy: {
+          _id: user._id,
+          name: user.name,
+        },
+      })
+      .select('-password');
     return data;
   }
 
   // delete user
-  async remove(id: string) {
+  async remove(id: string, @RequestUser() user: IUser) {
     if (!isValidObjectId(id) || !(await this.userModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
 
+    // add deleteBy
+    await this.userModel.findByIdAndUpdate(id, {
+      deletedBy: {
+        _id: user._id,
+        name: user.name,
+      },
+    });
+
+    // use soft delete
     const data = await this.userModel.softDelete({
       _id: id,
     });

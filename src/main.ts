@@ -22,8 +22,6 @@ async function bootstrap() {
   const version = configService.get('VERSION_API') || 'v2';
   const prefix = configService.get('PREFIX_API') || 'api';
 
-  console.log('version', version);
-  console.log('prefix', prefix);
   app.setGlobalPrefix(prefix);
   app.enableVersioning({
     type: VersioningType.URI,

@@ -12,7 +12,7 @@ import {
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { ResponseMessage, RequestUser } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 
@@ -22,7 +22,10 @@ export class CompaniesController {
 
   @Post('create-new-company')
   @ResponseMessage(MESSAGE_SUCCESS.CREATE_NEW_COMPANY_SUCCESS)
-  create(@Body() createCompanyDto: CreateCompanyDto, @User() user: IUser) {
+  create(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @RequestUser() user: IUser,
+  ) {
     try {
       return this.companiesService.create(createCompanyDto, user);
     } catch (err) {
@@ -62,7 +65,7 @@ export class CompaniesController {
   update(
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDto,
-    @User() user: IUser,
+    @RequestUser() user: IUser,
   ) {
     try {
       return this.companiesService.update(id, updateCompanyDto, user);
@@ -73,7 +76,7 @@ export class CompaniesController {
 
   @Delete('/delete-company/:id')
   @ResponseMessage(MESSAGE_SUCCESS.DELETE_COMPANY_SUCCESS)
-  remove(@Param('id') id: string, @User() user: IUser) {
+  remove(@Param('id') id: string, @RequestUser() user: IUser) {
     try {
       return this.companiesService.remove(id, user);
     } catch (err) {

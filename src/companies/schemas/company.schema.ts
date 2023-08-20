@@ -15,29 +15,29 @@ export class Company {
   @Prop()
   description: string;
 
+  @Prop()
+  createdAt: Date;
+
   @Prop({ type: Object })
   createdBy: {
     _id: mongoose.Schema.Types.ObjectId;
   };
+
+  @Prop()
+  updatedAt: Date;
 
   @Prop({ type: Object })
   updatedBy: {
     _id: mongoose.Schema.Types.ObjectId;
   };
 
+  @Prop()
+  isDeleted: boolean;
+
   @Prop({ type: Object })
   deletedBy: {
     _id: mongoose.Schema.Types.ObjectId;
   };
-
-  @Prop()
-  createdAt: Date;
-
-  @Prop()
-  updatedAt: Date;
-
-  @Prop()
-  isDeleted: boolean;
 
   @Prop()
   deletedAt: Date;
