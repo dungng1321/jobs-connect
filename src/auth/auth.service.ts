@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import ms from 'ms';
 
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/schemas/user.schema';
@@ -12,6 +15,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -23,7 +27,17 @@ export class AuthService {
     }
   }
 
-  async login(user: IUser) {
+  // handle refresh token
+  async createRefreshToken(payload: any) {
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_RF_SECRET'),
+      expiresIn: this.configService.get('JWT_RF_EXPIRATION_TIME'),
+    });
+
+    return refreshToken;
+  }
+
+  async login(user: IUser, response: Response) {
     const { _id, name, email, role } = user;
     const payload = {
       sub: 'token login system',
@@ -32,12 +46,32 @@ export class AuthService {
       email,
       role,
     };
+
+    const refreshToken = await this.createRefreshToken(payload);
+
+    // update user refresh token
+    await this.usersService.updateRefreshToken(_id, refreshToken);
+
+    // set cookie
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: ms(
+        this.configService.get<string>('JWT_RF_EXPIRATION_TIME') as string,
+      ),
+    });
+
+    // delete  all cookie with destroy
+    response.clearCookie('key1');
+
     return {
       access_token: this.jwtService.sign(payload),
-      _id,
-      name,
-      email,
-      role,
+      user: {
+        _id,
+        name,
+        email,
+        role,
+      },
     };
   }
 

@@ -142,7 +142,7 @@ export class UsersService {
     const data = await this.userModel
       .findByIdAndUpdate(id, {
         ...updateUserDto,
-        createBy: {
+        updatedBy: {
           _id: user._id,
           name: user.name,
         },
@@ -171,5 +171,14 @@ export class UsersService {
     });
 
     return data;
+  }
+
+  // check and update user with refresh token and save to cookies
+  async updateRefreshToken(id: string, refreshToken: string) {
+    const updateData = await this.userModel.findByIdAndUpdate(id, {
+      refreshToken: refreshToken,
+    });
+
+    return updateData;
   }
 }

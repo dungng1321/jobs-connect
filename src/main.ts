@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
@@ -10,6 +11,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
+
+  // use cookie parser middleware
+  app.use(cookieParser());
 
   // enable guard global
   const reflector = app.get(Reflector);
@@ -25,7 +29,6 @@ async function bootstrap() {
   app.setGlobalPrefix(prefix);
   app.enableVersioning({
     type: VersioningType.URI,
-
     defaultVersion: version,
   });
 

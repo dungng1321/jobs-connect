@@ -4,16 +4,18 @@ import {
   Controller,
   UseGuards,
   Req,
+  Res,
   HttpException,
   Body,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { Public } from 'src/decorator/customize';
+import { Request, Response } from 'express';
+import { Public, RequestUser } from 'src/decorator/customize';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { ResponseMessage } from 'src/decorator/customize';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
+import { IUser } from 'src/users/interface/user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -21,9 +23,13 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
+  @ResponseMessage(MESSAGE_SUCCESS.LOGIN_SUCCESS)
   @Post('/login')
-  async login(@Req() req: any) {
-    return this.authService.login(req.user);
+  async handleLogin(
+    @Req() req: Request & { user: IUser },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.login(req.user, res);
   }
 
   @Public()
@@ -41,5 +47,11 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req: Request) {
     return req.user;
+  }
+
+  // handle get user when f5
+  @Get('/account')
+  async handleGetUser(@RequestUser() user: IUser) {
+    return { user };
   }
 }
