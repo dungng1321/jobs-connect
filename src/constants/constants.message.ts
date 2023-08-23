@@ -13,12 +13,15 @@ export const MESSAGE_SUCCESS = {
 
   // user
   LOGIN_SUCCESS: 'Login success',
+  LOGOUT_SUCCESS: 'Logout success',
   CREATE_NEW_USER_SUCCESS: 'Create new user success',
   REGISTER_NEW_USER_SUCCESS: 'Register new user success',
   UPDATE_USER_SUCCESS: 'Update user success',
   GET_USER_SUCCESS: 'Get user success',
   GET_USERS_SUCCESS: 'Get users success',
   DELETE_USER_SUCCESS: 'Delete user success',
+
+  REFRESH_TOKEN_SUCCESS: 'Refresh token success',
 
   // company
   CREATE_NEW_COMPANY_SUCCESS: 'Create new company success',

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -27,8 +27,8 @@ export class AuthService {
     }
   }
 
-  // handle refresh token
-  async createRefreshToken(payload: any) {
+  // generate refresh token
+  async generateRefreshToken(payload: any) {
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_RF_SECRET'),
       expiresIn: this.configService.get('JWT_RF_EXPIRATION_TIME'),
@@ -37,46 +37,71 @@ export class AuthService {
     return refreshToken;
   }
 
+  // handle login api
   async login(user: IUser, response: Response) {
     const { _id, name, email, role } = user;
-    const payload = {
-      sub: 'token login system',
-      _id,
-      name,
-      email,
-      role,
-    };
+    const payload = { sub: 'token login system', _id, name, email, role };
 
-    const refreshToken = await this.createRefreshToken(payload);
+    const refreshToken = await this.generateRefreshToken(payload);
 
-    // update user refresh token
-    await this.usersService.updateRefreshToken(_id, refreshToken);
+    // save refresh token to db
+    await this.usersService.updateRefreshTokenField(_id, refreshToken);
 
-    // set cookie
+    // set refresh token to cookie
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: ms(
-        this.configService.get<string>('JWT_RF_EXPIRATION_TIME') as string,
-      ),
+      maxAge: ms(this.configService.get('JWT_RF_EXPIRATION_TIME') as string),
     });
-
-    // delete  all cookie with destroy
-    response.clearCookie('key1');
 
     return {
       access_token: this.jwtService.sign(payload),
-      user: {
-        _id,
-        name,
-        email,
-        role,
-      },
+      user: { _id, name, email, role },
     };
   }
 
-  // register user by user
-  async register(registerUserDto: RegisterUserDto) {
+  // handle refresh token api, create new access token
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get('JWT_RF_SECRET'),
+      });
+
+      const user = await this.usersService.findOne(payload._id);
+
+      // update  new access token
+      if (user) {
+        const { _id, name, email, role } = user;
+        const payload = {
+          _id,
+          name,
+          email,
+          role,
+        };
+        const newAccessToken = this.jwtService.sign(payload);
+
+        return {
+          access_token: newAccessToken,
+          user: payload,
+        };
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message, error.statusCode);
+    }
+  }
+
+  // handle logout, set refresh token to null
+  async logout(user: IUser, res: Response) {
+    try {
+      await this.usersService.updateRefreshTokenField(user._id, '');
+      res.clearCookie('refreshToken');
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
+    }
+  }
+
+  // register new user by user
+  async registerUser(registerUserDto: RegisterUserDto) {
     return await this.usersService.register(registerUserDto);
   }
 }

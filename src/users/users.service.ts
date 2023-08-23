@@ -173,8 +173,8 @@ export class UsersService {
     return data;
   }
 
-  // check and update user with refresh token and save to cookies
-  async updateRefreshToken(id: string, refreshToken: string) {
+  // save refresh token to db
+  async updateRefreshTokenField(id: string, refreshToken: string) {
     const updateData = await this.userModel.findByIdAndUpdate(id, {
       refreshToken: refreshToken,
     });

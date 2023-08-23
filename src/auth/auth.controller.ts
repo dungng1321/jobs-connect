@@ -9,10 +9,10 @@ import {
   Body,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Public, RequestUser } from 'src/decorator/customize';
+
+import { Public, RequestUser, ResponseMessage } from 'src/decorator/customize';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { ResponseMessage } from 'src/decorator/customize';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 import { IUser } from 'src/users/interface/user.interface';
@@ -37,7 +37,7 @@ export class AuthController {
   @ResponseMessage(MESSAGE_SUCCESS.REGISTER_NEW_USER_SUCCESS)
   async register(@Body() registerUserDto: RegisterUserDto) {
     try {
-      return await this.authService.register(registerUserDto);
+      return await this.authService.registerUser(registerUserDto);
     } catch (error) {
       throw new HttpException(error.message, error.statusCode);
     }
@@ -53,5 +53,33 @@ export class AuthController {
   @Get('/account')
   async handleGetUser(@RequestUser() user: IUser) {
     return { user };
+  }
+
+  //handle refresh token to get new access token
+  @Public()
+  @Get('/refresh-token')
+  @ResponseMessage(MESSAGE_SUCCESS.REFRESH_TOKEN_SUCCESS)
+  async handleRefreshToken(@Req() req: Request) {
+    try {
+      const { refreshToken } = req.cookies;
+      return this.authService.refreshAccessToken(refreshToken);
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
+    }
+  }
+
+  // handle logout
+  @Post('/logout')
+  @ResponseMessage(MESSAGE_SUCCESS.LOGOUT_SUCCESS)
+  async handleLogout(
+    @Res({ passthrough: true }) res: Response,
+    @RequestUser() user: IUser,
+  ) {
+    try {
+      await this.authService.logout(user, res);
+      res.clearCookie('refreshToken');
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
+    }
   }
 }
