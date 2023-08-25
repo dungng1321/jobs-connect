@@ -9,6 +9,9 @@ export const MESSAGE_ERROR = {
 
   // job
   JOB_NOT_FOUND: 'Job not found',
+
+  // date
+  INVALID_END_DATE: 'End date must be greater than start date',
 };
 
 export const MESSAGE_SUCCESS = {

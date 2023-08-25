@@ -8,8 +8,9 @@ import {
   IsNotEmptyObject,
   IsArray,
   ArrayMinSize,
+  IsDate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import mongoose from 'mongoose';
 
 class Company {
@@ -60,9 +61,13 @@ export class CreateJobDto {
   description: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   startDate: Date;
 
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   endDate: Date;
 
   @IsNotEmpty()

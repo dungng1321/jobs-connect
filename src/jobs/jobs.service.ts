@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { isValidObjectId } from 'mongoose';
@@ -10,6 +14,7 @@ import { Job, JobDocument } from './schemas/job.shema';
 import { RequestUser } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_ERROR } from 'src/constants/constants.message';
+import { validateDateOrder } from 'src/util/validateDateOrder';
 
 @Injectable()
 export class JobsService {
@@ -20,6 +25,11 @@ export class JobsService {
 
   // create new job
   async create(createJobDto: CreateJobDto, @RequestUser() user: IUser) {
+    const { startDate, endDate } = createJobDto;
+
+    if (!validateDateOrder(startDate, endDate)) {
+      throw new BadRequestException(MESSAGE_ERROR.INVALID_END_DATE);
+    }
     const newJob = await this.jobModel.create({
       ...createJobDto,
       createdBy: {
@@ -88,6 +98,15 @@ export class JobsService {
     updateJobDto: UpdateJobDto,
     @RequestUser() user: IUser,
   ) {
+    const { startDate, endDate } = updateJobDto;
+
+    if (!startDate || !endDate) {
+      throw new BadRequestException(MESSAGE_ERROR.INVALID_END_DATE);
+    }
+
+    if (!validateDateOrder(startDate, endDate)) {
+      throw new BadRequestException(MESSAGE_ERROR.INVALID_END_DATE);
+    }
     if (!isValidObjectId(id) || !(await this.jobModel.findById(id))) {
       throw new NotFoundException(MESSAGE_ERROR.JOB_NOT_FOUND);
     }

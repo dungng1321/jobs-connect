@@ -47,9 +47,9 @@ dependencies:
   cookie-parser:
     specifier: ^1.4.6
     version: 1.4.6
-  moment:
-    specifier: ^2.29.4
-    version: 2.29.4
+  dayjs:
+    specifier: ^1.11.9
+    version: 1.11.9
   mongoose:
     specifier: ^7.4.3
     version: 7.4.3
@@ -2373,6 +2373,10 @@ packages:
       '@babel/runtime': 7.22.10
     dev: false
 
+  /dayjs@1.11.9:
+    resolution: {integrity: sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA==}
+    dev: false
+
   /debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
     peerDependencies:
@@ -4173,10 +4177,6 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
-
-  /moment@2.29.4:
-    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
-    dev: false
 
   /mongodb-connection-string-url@2.6.0:
     resolution: {integrity: sha512-WvTZlI9ab0QYtTYnuMLgobULWhokRjtC7db9LtcVfJ+Hsnyr5eo6ZtNAt3Ly24XZScGMelOcGtm7lSn0332tPQ==}
