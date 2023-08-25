@@ -3,10 +3,10 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import qs from 'qs';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import app from 'api-query-params';
 
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -69,36 +69,33 @@ export class UsersService {
   }
 
   // get all user with pagination and filter
-  async findAll(page: number, limit: number, queryString: string) {
-    const searchQuery = qs.parse(queryString, { ignoreQueryPrefix: true });
+  async findAll(currentPage: number, limit: number, queryString: string) {
+    const { filter, sort, population } = app(queryString);
 
-    const { age, name, address, email } = searchQuery;
-    const filter: any = {};
+    delete filter.current;
+    delete filter.pageSize;
 
-    if (age) filter.age = +age;
-    if (name) filter.name = { $regex: name, $options: 'i' };
-    if (address) filter.address = { $regex: address, $options: 'i' };
-    if (email) filter.email = { $regex: email, $options: 'i' };
+    const skip = (currentPage - 1) * limit;
+    const defaultLimit = limit || 10;
+    const totalItems = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
 
-    const totalUser = await this.userModel.countDocuments(filter);
-
-    let dataQuery = this.userModel.find(filter).select('-password');
-    if (page && limit) {
-      const skip = (page - 1) * limit;
-      dataQuery = dataQuery.skip(skip).limit(limit);
-    }
-
-    const data = await dataQuery;
-    const responseMeta = {
-      currentPage: page || 1,
-      totalUserInPage: data.length,
-      totalUser: totalUser,
-      TotalPage: limit ? Math.ceil(totalUser / limit) : 1,
-      limit: limit || totalUser,
-    };
+    const data = await this.userModel
+      .find(filter)
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .select('-password')
+      .populate(population)
+      .exec();
 
     return {
-      meta: responseMeta,
+      meta: {
+        currentPage,
+        pageSize: defaultLimit,
+        totalPages,
+        totalItems,
+      },
       data,
     };
   }

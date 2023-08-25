@@ -38,12 +38,12 @@ export class UsersController {
   @Get('/get-all-user')
   @ResponseMessage(MESSAGE_SUCCESS.GET_USERS_SUCCESS)
   findAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('current') currentPage: number,
+    @Query('pageSize') limit: number,
     @Query() queryString: string,
   ) {
     try {
-      return this.usersService.findAll(page, limit, queryString);
+      return this.usersService.findAll(currentPage, limit, queryString);
     } catch (err) {
       throw new HttpException(err.message, err.statusCode);
     }

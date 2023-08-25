@@ -33,16 +33,16 @@ export class CompaniesController {
     }
   }
 
-  // get all company with pagination and search
-  @Get('/get-all-company')
+  // get all companies with pagination and search
+  @Get('/get-all-companies')
   @ResponseMessage(MESSAGE_SUCCESS.GET_COMPANIES_SUCCESS)
   findAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('current') currentPage: number,
+    @Query('pageSize') limit: number,
     @Query() queryString: string,
   ) {
     try {
-      return this.companiesService.findAll(page, limit, queryString);
+      return this.companiesService.findAll(currentPage, limit, queryString);
     } catch (error) {
       throw new HttpException(error.message, error.statusCode);
     }

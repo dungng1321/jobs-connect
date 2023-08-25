@@ -6,6 +6,9 @@ export const MESSAGE_ERROR = {
 
   // company
   COMPANY_NOT_FOUND: 'Company not found',
+
+  // job
+  JOB_NOT_FOUND: 'Job not found',
 };
 
 export const MESSAGE_SUCCESS = {
@@ -29,4 +32,12 @@ export const MESSAGE_SUCCESS = {
   GET_COMPANY_SUCCESS: 'Get company success',
   GET_COMPANIES_SUCCESS: 'Get companies success',
   DELETE_COMPANY_SUCCESS: 'Delete company success',
+
+  // jobs
+
+  CREATE_NEW_JOB_SUCCESS: 'Create new job success',
+  UPDATE_JOB_SUCCESS: 'Update job success',
+  GET_JOB_SUCCESS: 'Get job success',
+  GET_JOBS_SUCCESS: 'Get jobs success',
+  DELETE_JOB_SUCCESS: 'Delete job success',
 };

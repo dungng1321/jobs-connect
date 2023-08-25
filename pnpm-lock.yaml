@@ -32,9 +32,9 @@ dependencies:
   '@types/bcryptjs':
     specifier: ^2.4.2
     version: 2.4.2
-  '@types/qs':
-    specifier: ^6.9.7
-    version: 6.9.7
+  api-query-params:
+    specifier: ^5.4.0
+    version: 5.4.0
   bcryptjs:
     specifier: ^2.4.3
     version: 2.4.3
@@ -65,9 +65,6 @@ dependencies:
   passport-local:
     specifier: ^1.0.0
     version: 1.0.0
-  qs:
-    specifier: ^6.11.2
-    version: 6.11.2
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
@@ -1381,6 +1378,7 @@ packages:
 
   /@types/qs@6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
+    dev: true
 
   /@types/range-parser@1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
@@ -1806,6 +1804,10 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
     dev: true
+
+  /api-query-params@5.4.0:
+    resolution: {integrity: sha512-dQ6HwtM4Z7Kpmcbd5jZr3PzwwB7mj0tRbOaP3WTA+YOmFcGyj/8hpD65O7QqvcbToTcFjQDznSmlLms24UaFhA==}
+    dev: false
 
   /append-field@1.0.0:
     resolution: {integrity: sha512-klpgFSWLW1ZEs8svjfb7g4qWY0YS5imI82dTg+QahUvJ8YqAY0P10Uk8tTyh9ZGuYEZEMaeJYCF5BFuX552hsw==}
@@ -4727,6 +4729,7 @@ packages:
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
+    dev: true
 
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import qs from 'qs';
+import app from 'api-query-params';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -35,39 +35,33 @@ export class CompaniesService {
   }
 
   // get all company with pagination and search
-  async findAll(page: number, limit: number, queryString: string) {
-    const searchQuery = qs.parse(queryString, { ignoreQueryPrefix: true });
+  async findAll(currentPage: number, limit: number, queryString: string) {
+    const { filter, sort, population } = app(queryString);
 
-    console.log(`queryString`, queryString);
-    console.log(`searchQuery`, searchQuery);
+    delete filter.current;
+    delete filter.pageSize;
 
-    const { name, address } = searchQuery;
-    const filter: any = {};
+    const skip = (currentPage - 1) * limit;
+    const defaultLimit = limit || 10;
+    const totalItems = (await this.companyModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
 
-    if (name) filter.name = { $regex: name, $options: 'i' };
-    if (address) filter.address = { $regex: address, $options: 'i' };
-
-    const totalCompany = await this.companyModel.countDocuments(filter);
-
-    let dataQuery = this.companyModel.find(filter);
-
-    if (page && limit) {
-      const skip = limit * (page - 1);
-      dataQuery = dataQuery.skip(skip).limit(limit);
-    }
-
-    const data = await dataQuery;
-    const responseMeta = {
-      currentPage: page || 1,
-      totalCompanyInPage: data.length,
-      totalCompany: totalCompany,
-      totalPages: limit ? Math.ceil(totalCompany / limit) : 1,
-      limit: limit || totalCompany,
-    };
+    const data = await this.companyModel
+      .find(filter)
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .populate(population)
+      .exec();
 
     return {
-      meta: responseMeta,
-      data: data,
+      meta: {
+        currentPage,
+        pageSize: defaultLimit,
+        totalPages,
+        totalItems,
+      },
+      data,
     };
   }
 
