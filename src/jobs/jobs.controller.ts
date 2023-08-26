@@ -72,7 +72,7 @@ export class JobsController {
   }
 
   // delete job
-  @Delete(':id')
+  @Delete('/delete-job/:id')
   @ResponseMessage(MESSAGE_SUCCESS.DELETE_JOB_SUCCESS)
   remove(@Param('id') id: string, @RequestUser() user: IUser) {
     try {

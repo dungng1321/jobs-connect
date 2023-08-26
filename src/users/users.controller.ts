@@ -35,7 +35,7 @@ export class UsersController {
   }
 
   // get all user with pagination and search
-  @Get('/get-all-user')
+  @Get('/get-all-users')
   @ResponseMessage(MESSAGE_SUCCESS.GET_USERS_SUCCESS)
   findAll(
     @Query('current') currentPage: number,
@@ -50,7 +50,7 @@ export class UsersController {
   }
 
   // get user by id
-  @Get('/get-user-by-id/:id')
+  @Get('/get-user/:id')
   @ResponseMessage(MESSAGE_SUCCESS.GET_USER_SUCCESS)
   findOne(@Param('id') id: string) {
     try {
