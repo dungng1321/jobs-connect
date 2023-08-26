@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   HttpException,
   HttpStatus,
@@ -39,9 +40,10 @@ export class FilesController {
         }),
     )
     file: Express.Multer.File,
+    @Body('folderName') folderName?: string,
   ) {
     try {
-      const fileUrl = await this.filesService.uploadFileToS3(file);
+      const fileUrl = await this.filesService.uploadFileToS3(file, folderName);
       return { url: fileUrl };
     } catch (error) {
       throw new HttpException(error.message, error.status);

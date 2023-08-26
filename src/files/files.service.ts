@@ -8,37 +8,42 @@ import { ConfigService } from '@nestjs/config';
 export class FilesService {
   constructor(private readonly configService: ConfigService) {}
 
-  async uploadFileToS3(file: Express.Multer.File): Promise<string> {
-    const accessKeyId = this.configService.get('AWS_ACCESS_KEY_ID');
-    const secretAccessKey = this.configService.get('AWS_SECRET_ACCESS_KEY');
-    const region = this.configService.get('AWS_DEFAULT_REGION');
-    const bucketName = this.configService.get('AWS_BUCKET_NAME');
+  async uploadFileToS3(
+    file: Express.Multer.File,
+    folderName?: string,
+  ): Promise<string> {
+    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID');
+    const secretAccessKey = this.configService.get<string>(
+      'AWS_SECRET_ACCESS_KEY',
+    );
+    const region = this.configService.get<string>('AWS_DEFAULT_REGION');
+    const bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
 
     if (!accessKeyId || !secretAccessKey) {
       throw new Error('AWS credentials are missing.');
     }
+
     const s3 = new S3Client({
       region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
+      credentials: { accessKeyId, secretAccessKey },
     });
 
-    const key = `${uuidv5(file.originalname, uuidv5.URL)}`;
+    const keyPrefix = folderName ? `${folderName}/` : 'default/';
+    const key = `${keyPrefix}${uuidv5(file.originalname, uuidv5.URL)}`;
 
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
       Body: file.buffer,
       ACL: 'public-read',
+      ContentType: file.mimetype,
+      ContentDisposition: 'inline',
     });
 
     try {
       await s3.send(command);
       return `https://${bucketName}.s3.amazonaws.com/${key}`;
     } catch (error) {
-      console.error('Error uploading file to S3:', error);
       throw new Error('Failed to upload file to S3');
     }
   }
