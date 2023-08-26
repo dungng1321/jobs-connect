@@ -6,6 +6,9 @@ export type JobDocument = HydratedDocument<Job>;
 @Schema({ timestamps: true })
 export class Job {
   @Prop()
+  logo: string;
+
+  @Prop()
   name: string;
 
   @Prop()
@@ -15,6 +18,7 @@ export class Job {
   company: {
     _id: mongoose.Schema.Types.ObjectId;
     name: string;
+    logo: string;
   };
 
   @Prop()

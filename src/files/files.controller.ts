@@ -1,24 +1,31 @@
 import {
   Controller,
+  HttpException,
+  HttpStatus,
+  ParseFilePipeBuilder,
   Post,
   UploadedFile,
   UseInterceptors,
-  ParseFilePipeBuilder,
-  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 
 import { FilesService } from './files.service';
-
 import { ALLOWED_FILE_TYPES } from 'src/constants/constants.common';
+import { ResponseMessage } from 'src/decorator/customize';
+import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('/upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(
+  @ResponseMessage(MESSAGE_SUCCESS.UPLOAD_FILE_SUCCESS)
+  @UseInterceptors(FileInterceptor('fileUpload'))
+  async uploadFile(
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -33,6 +40,11 @@ export class FilesController {
     )
     file: Express.Multer.File,
   ) {
-    console.log(file);
+    try {
+      const fileUrl = await this.filesService.uploadFileToS3(file);
+      return { url: fileUrl };
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 }

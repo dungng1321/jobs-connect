@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/credential-provider-node": "^3.398.0",
     "@nestjs/common": "^9.4.3",
     "@nestjs/config": "^2.3.4",
     "@nestjs/core": "^9.4.3",
@@ -42,7 +44,8 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "soft-delete-plugin-mongoose": "^1.0.15"
+    "soft-delete-plugin-mongoose": "^1.0.15",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.5.0",
@@ -57,6 +60,7 @@
     "@types/passport-jwt": "^3.0.9",
     "@types/passport-local": "^1.0.35",
     "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.47.0",

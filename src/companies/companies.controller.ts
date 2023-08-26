@@ -12,7 +12,7 @@ import {
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { ResponseMessage, RequestUser } from 'src/decorator/customize';
+import { ResponseMessage, RequestUser, Public } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 
@@ -34,6 +34,7 @@ export class CompaniesController {
   }
 
   // get all companies with pagination and search
+  @Public()
   @Get('/get-all-companies')
   @ResponseMessage(MESSAGE_SUCCESS.GET_COMPANIES_SUCCESS)
   findAll(
@@ -49,6 +50,7 @@ export class CompaniesController {
   }
 
   // get company by id
+  @Public()
   @Get('/get-company/:id')
   @ResponseMessage(MESSAGE_SUCCESS.GET_COMPANY_SUCCESS)
   findOne(@Param('id') id: string) {

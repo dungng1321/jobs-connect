@@ -17,6 +17,9 @@ class Company {
   @IsNotEmpty()
   _id: mongoose.Schema.Types.ObjectId;
 
+  @IsNotEmpty()
+  logo: string;
+
   @IsString()
   @IsNotEmpty()
   name: string;

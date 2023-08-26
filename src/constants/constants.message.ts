@@ -43,4 +43,7 @@ export const MESSAGE_SUCCESS = {
   GET_JOB_SUCCESS: 'Get job success',
   GET_JOBS_SUCCESS: 'Get jobs success',
   DELETE_JOB_SUCCESS: 'Delete job success',
+
+  // files
+  UPLOAD_FILE_SUCCESS: 'Upload file success',
 };

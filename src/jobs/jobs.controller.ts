@@ -13,7 +13,7 @@ import {
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-import { RequestUser, ResponseMessage } from 'src/decorator/customize';
+import { Public, RequestUser, ResponseMessage } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 
@@ -33,6 +33,7 @@ export class JobsController {
   }
 
   // get all jobs with pagination and search
+  @Public()
   @Get('/get-all-jobs')
   @ResponseMessage(MESSAGE_SUCCESS.GET_JOBS_SUCCESS)
   findAll(
@@ -48,6 +49,7 @@ export class JobsController {
   }
 
   // get job by id
+  @Public()
   @Get('/get-job/:id')
   @ResponseMessage(MESSAGE_SUCCESS.GET_JOB_SUCCESS)
   findOne(@Param('id') id: string) {

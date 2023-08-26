@@ -7,6 +7,9 @@ export type CompanyDocument = HydratedDocument<Company>;
 @Schema({ timestamps: true })
 export class Company {
   @Prop()
+  logo: string;
+
+  @Prop()
   name: string;
 
   @Prop()
