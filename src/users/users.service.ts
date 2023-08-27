@@ -15,7 +15,7 @@ import { hashPassword } from 'src/util/hashPassword';
 import { MESSAGE_ERROR } from 'src/constants/constants.message';
 import { IUser } from './interface/user.interface';
 import { RequestUser } from 'src/decorator/customize';
-import { Position } from 'src/constants/positionEnum';
+import { Position } from 'src/constants/constantsEnum';
 
 @Injectable()
 export class UsersService {
@@ -137,13 +137,17 @@ export class UsersService {
     }
 
     const data = await this.userModel
-      .findByIdAndUpdate(id, {
-        ...updateUserDto,
-        updatedBy: {
-          _id: user._id,
-          name: user.name,
+      .findByIdAndUpdate(
+        id,
+        {
+          ...updateUserDto,
+          updatedBy: {
+            _id: user._id,
+            name: user.name,
+          },
         },
-      })
+        { new: true },
+      )
       .select('-password');
     return data;
   }
@@ -155,12 +159,16 @@ export class UsersService {
     }
 
     // add deleteBy
-    await this.userModel.findByIdAndUpdate(id, {
-      deletedBy: {
-        _id: user._id,
-        name: user.name,
+    await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        deletedBy: {
+          _id: user._id,
+          name: user.name,
+        },
       },
-    });
+      { new: true },
+    );
 
     // use soft delete
     const data = await this.userModel.softDelete({
@@ -172,9 +180,13 @@ export class UsersService {
 
   // save refresh token to db
   async updateRefreshTokenField(id: string, refreshToken: string) {
-    const updateData = await this.userModel.findByIdAndUpdate(id, {
-      refreshToken: refreshToken,
-    });
+    const updateData = await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        refreshToken: refreshToken,
+      },
+      { new: true },
+    );
 
     return updateData;
   }

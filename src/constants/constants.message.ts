@@ -10,6 +10,9 @@ export const MESSAGE_ERROR = {
   // job
   JOB_NOT_FOUND: 'Job not found',
 
+  // resume
+  RESUME_NOT_FOUND: 'Resume not found',
+
   // date
   INVALID_END_DATE: 'End date must be greater than start date',
 };
@@ -46,4 +49,11 @@ export const MESSAGE_SUCCESS = {
 
   // files
   UPLOAD_FILE_SUCCESS: 'Upload file success',
+
+  // resumes
+  CREATE_NEW_RESUME_SUCCESS: 'Create new resume success',
+  UPDATE_RESUME_SUCCESS: 'Update resume success',
+  GET_RESUME_SUCCESS: 'Get resume success',
+  GET_RESUMES_SUCCESS: 'Get resumes success',
+  DELETE_RESUME_SUCCESS: 'Delete resume success',
 };

@@ -92,14 +92,18 @@ export class CompaniesService {
       throw new NotFoundException(MESSAGE_ERROR.COMPANY_NOT_FOUND);
     }
 
-    const data = await this.companyModel.findByIdAndUpdate(id, {
-      ...updateCompanyDto,
-      updatedBy: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
+    const data = await this.companyModel.findByIdAndUpdate(
+      id,
+      {
+        ...updateCompanyDto,
+        updatedBy: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        },
       },
-    });
+      { new: true },
+    );
 
     return data;
   }
