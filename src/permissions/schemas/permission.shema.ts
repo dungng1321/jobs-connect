@@ -1,55 +1,52 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
 import mongoose, { HydratedDocument } from 'mongoose';
 
-export type CompanyDocument = HydratedDocument<Company>;
+export type PermissionDocument = HydratedDocument<Permission>;
 
 @Schema({ timestamps: true })
-export class Company {
-  @Prop()
-  logo: string;
-
+export class Permission {
   @Prop()
   name: string;
 
   @Prop()
-  address: string;
+  apiPath: string;
 
   @Prop()
-  description: string;
+  method: string;
 
+  @Prop()
+  module: string;
+
+  // action audit
   @Prop()
   createdAt: Date;
 
   @Prop({ type: Object })
   createdBy: {
     _id: mongoose.Schema.Types.ObjectId;
-    name: string;
+    email: string;
+  };
+
+  @Prop({ type: Object })
+  updatedBy: {
+    _id: mongoose.Schema.Types.ObjectId;
     email: string;
   };
 
   @Prop()
   updatedAt: Date;
 
-  @Prop({ type: Object })
-  updatedBy: {
-    _id: mongoose.Schema.Types.ObjectId;
-    name: string;
-    email: string;
-  };
-
   @Prop()
   isDeleted: boolean;
+
+  @Prop()
+  deletedAt: Date;
 
   @Prop({ type: Object })
   deletedBy: {
     _id: mongoose.Schema.Types.ObjectId;
-    name: string;
     email: string;
   };
-
-  @Prop()
-  deletedAt: Date;
 }
 
-export const CompanySchema = SchemaFactory.createForClass(Company);
+export const PermissionSchema = SchemaFactory.createForClass(Permission);

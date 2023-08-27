@@ -15,6 +15,10 @@ export const MESSAGE_ERROR = {
 
   // date
   INVALID_END_DATE: 'End date must be greater than start date',
+
+  // permission
+  PERMISSION_NOT_FOUND: 'Permission not found',
+  PERMISSION_EXIST: 'Permission already exists',
 };
 
 export const MESSAGE_SUCCESS = {
@@ -56,4 +60,11 @@ export const MESSAGE_SUCCESS = {
   GET_RESUME_SUCCESS: 'Get resume success',
   GET_RESUMES_SUCCESS: 'Get resumes success',
   DELETE_RESUME_SUCCESS: 'Delete resume success',
+
+  //permissions
+  CREATE_NEW_PERMISSION_SUCCESS: 'Create new permission success',
+  UPDATE_PERMISSION_SUCCESS: 'Update permission success',
+  GET_PERMISSION_SUCCESS: 'Get permission success',
+  GET_PERMISSIONS_SUCCESS: 'Get permissions success',
+  DELETE_PERMISSION_SUCCESS: 'Delete permission success',
 };

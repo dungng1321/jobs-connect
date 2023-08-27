@@ -39,6 +39,7 @@ export class UsersService {
       createdBy: {
         _id: user._id,
         name: user.name,
+        email: user.email,
       },
     });
 
@@ -144,6 +145,7 @@ export class UsersService {
           updatedBy: {
             _id: user._id,
             name: user.name,
+            email: user.email,
           },
         },
         { new: true },
@@ -165,6 +167,7 @@ export class UsersService {
         deletedBy: {
           _id: user._id,
           name: user.name,
+          email: user.email,
         },
       },
       { new: true },
