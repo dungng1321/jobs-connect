@@ -106,7 +106,16 @@ export class UsersService {
     if (!isValidObjectId(id)) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
-    const user = await this.userModel.findById(id).select('-password');
+    const user = await this.userModel
+      .findById(id)
+      .select('-password')
+      .populate({
+        path: 'role',
+        select: {
+          _id: 1,
+          name: 1,
+        },
+      });
     if (!user) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
@@ -117,7 +126,13 @@ export class UsersService {
 
   // find user by username
   async findByUsername(username: string) {
-    const user = await this.userModel.findOne({ email: username });
+    const user = await this.userModel.findOne({ email: username }).populate({
+      path: 'role',
+      select: {
+        name: 1,
+        permissions: 1,
+      },
+    });
     if (!user) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }

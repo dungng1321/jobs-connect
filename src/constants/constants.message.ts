@@ -19,6 +19,11 @@ export const MESSAGE_ERROR = {
   // permission
   PERMISSION_NOT_FOUND: 'Permission not found',
   PERMISSION_EXIST: 'Permission already exists',
+
+  // role
+  ROLE_NOT_FOUND: 'Role not found',
+  ROLE_EXIST: 'Role already exists',
+  CANNOT_DELETE_ADMIN_ROLE: 'Cannot delete admin role',
 };
 
 export const MESSAGE_SUCCESS = {
@@ -67,4 +72,11 @@ export const MESSAGE_SUCCESS = {
   GET_PERMISSION_SUCCESS: 'Get permission success',
   GET_PERMISSIONS_SUCCESS: 'Get permissions success',
   DELETE_PERMISSION_SUCCESS: 'Delete permission success',
+
+  // roles
+  CREATE_NEW_ROLE_SUCCESS: 'Create new role success',
+  UPDATE_ROLE_SUCCESS: 'Update role success',
+  GET_ROLE_SUCCESS: 'Get role success',
+  GET_ROLES_SUCCESS: 'Get roles success',
+  DELETE_ROLE_SUCCESS: 'Delete role success',
 };

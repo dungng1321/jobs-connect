@@ -94,9 +94,21 @@ export class ResumesService {
 
   // find resume by user login
   async findByUserLogin(@RequestUser() user: IUser) {
-    const resume = await this.resumeModel.findOne({
-      userId: user._id,
-    });
+    const resume = await this.resumeModel
+      .find({
+        userId: user._id,
+      })
+      .sort({ createdAt: -1 })
+      .populate([
+        {
+          path: 'company',
+          select: { name: 1 },
+        },
+        {
+          path: 'job',
+          select: { name: 1 },
+        },
+      ]);
 
     return resume;
   }

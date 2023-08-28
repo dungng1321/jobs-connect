@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsInt,
   Min,
+  IsMongoId,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import mongoose from 'mongoose';
@@ -47,9 +48,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
-  role: string;
+  role: mongoose.Schema.Types.ObjectId;
 
   @IsDefined()
   @IsNotEmptyObject()
