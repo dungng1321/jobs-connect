@@ -25,6 +25,9 @@ export const MESSAGE_ERROR = {
   ROLE_NOT_FOUND: 'Role not found',
   ROLE_EXIST: 'Role already exists',
   CANNOT_DELETE_ADMIN_ROLE: 'Cannot delete admin role',
+
+  // subscriber
+  SUBSCRIBER_NOT_FOUND: 'Subscriber not found',
 };
 
 export const MESSAGE_SUCCESS = {
@@ -80,4 +83,11 @@ export const MESSAGE_SUCCESS = {
   GET_ROLE_SUCCESS: 'Get role success',
   GET_ROLES_SUCCESS: 'Get roles success',
   DELETE_ROLE_SUCCESS: 'Delete role success',
+
+  // subscribers
+  CREATE_NEW_SUBSCRIBER_SUCCESS: 'Create new subscriber success',
+  GET_SUBSCRIBER_SUCCESS: 'Get subscriber success',
+  GET_SUBSCRIBERS_SUCCESS: 'Get subscribers success',
+  UPDATE_SUBSCRIBER_SUCCESS: 'Update subscriber success',
+  DELETE_SUBSCRIBER_SUCCESS: 'Delete subscriber success',
 };
