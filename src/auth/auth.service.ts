@@ -28,8 +28,6 @@ export class AuthService {
       const userRole = user.role as unknown as IUser;
       const role = await this.rolesService.findOne(userRole?._id);
 
-      console.log('role', role);
-
       const objUser = {
         ...user,
         permissions: role?.permissions ?? [],
@@ -88,6 +86,11 @@ export class AuthService {
 
       const user = await this.usersService.findOne(payload._id);
 
+      // fetch  role and permissions
+      const userRole = user.role as unknown as IUser;
+      const roleData = await this.rolesService.findOne(userRole?._id);
+      const permissions = roleData?.permissions ?? [];
+
       // update  new access token
       if (user) {
         const { _id, name, email, role } = user;
@@ -96,20 +99,13 @@ export class AuthService {
           name,
           email,
           role,
+          permissions,
         };
         const newAccessToken = this.jwtService.sign(payload);
 
-        // fetch  role and permissions
-        const userRole = user.role as unknown as IUser;
-        const roleData = await this.rolesService.findOne(userRole?._id);
-        const permissions = roleData?.permissions ?? [];
-
         return {
           access_token: newAccessToken,
-          user: {
-            ...payload,
-            permissions,
-          },
+          user: payload,
         };
       }
     } catch (error) {
