@@ -9,12 +9,14 @@ import { User } from 'src/users/schemas/user.schema';
 import { comparePassword } from 'src/util/hashPassword';
 import { IUser } from 'src/users/interface/user.interface';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private rolesService: RolesService,
     private configService: ConfigService,
   ) {}
 
@@ -23,7 +25,17 @@ export class AuthService {
     const user = response as User;
 
     if (user && comparePassword(password, user.password)) {
-      return user;
+      const userRole = user.role as unknown as IUser;
+      const role = await this.rolesService.findOne(userRole?._id);
+
+      console.log('role', role);
+
+      const objUser = {
+        ...user,
+        permissions: role?.permissions ?? [],
+      };
+
+      return objUser;
     }
   }
 
@@ -39,8 +51,15 @@ export class AuthService {
 
   // handle login api
   async login(user: IUser, response: Response) {
-    const { _id, name, email, role } = user;
-    const payload = { sub: 'token login system', _id, name, email, role };
+    const { _id, name, email, role, permissions } = user;
+    const payload = {
+      sub: 'token login system',
+      _id,
+      name,
+      email,
+      role,
+      permissions,
+    };
 
     const refreshToken = await this.generateRefreshToken(payload);
 
@@ -56,7 +75,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      user: { _id, name, email, role },
+      user: payload,
     };
   }
 
@@ -80,9 +99,17 @@ export class AuthService {
         };
         const newAccessToken = this.jwtService.sign(payload);
 
+        // fetch  role and permissions
+        const userRole = user.role as unknown as IUser;
+        const roleData = await this.rolesService.findOne(userRole?._id);
+        const permissions = roleData?.permissions ?? [];
+
         return {
           access_token: newAccessToken,
-          user: payload,
+          user: {
+            ...payload,
+            permissions,
+          },
         };
       }
     } catch (error) {

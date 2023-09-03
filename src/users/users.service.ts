@@ -111,10 +111,7 @@ export class UsersService {
       .select('-password')
       .populate({
         path: 'role',
-        select: {
-          _id: 1,
-          name: 1,
-        },
+        select: 'name',
       });
     if (!user) {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
@@ -130,7 +127,6 @@ export class UsersService {
       path: 'role',
       select: {
         name: 1,
-        permissions: 1,
       },
     });
     if (!user) {
@@ -175,6 +171,11 @@ export class UsersService {
       throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
     }
 
+    const foundUser = await this.userModel.findById(id);
+    if (foundUser?.email === 'admin@gmail.com') {
+      throw new BadRequestException(MESSAGE_ERROR.CANNOT_DELETE_ADMIN);
+    }
+
     // add deleteBy
     await this.userModel.findByIdAndUpdate(
       id,
@@ -198,13 +199,20 @@ export class UsersService {
 
   // save refresh token to db
   async updateRefreshTokenField(id: string, refreshToken: string) {
-    const updateData = await this.userModel.findByIdAndUpdate(
-      id,
-      {
-        refreshToken: refreshToken,
-      },
-      { new: true },
-    );
+    const updateData = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        {
+          refreshToken: refreshToken,
+        },
+        { new: true },
+      )
+      .populate({
+        path: 'role',
+        select: {
+          name: 1,
+        },
+      });
 
     return updateData;
   }

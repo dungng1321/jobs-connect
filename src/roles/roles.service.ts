@@ -11,7 +11,6 @@ import { Role, RoleDocument } from './schemas/role.shema';
 import { RequestUser } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_ERROR } from 'src/constants/constants.message';
-import { Permission } from 'src/permissions/schemas/permission.shema';
 import { Position } from 'src/constants/constantsEnum';
 
 @Injectable()
@@ -80,14 +79,8 @@ export class RolesService {
     }
 
     const role = await this.roleModel.findById(id).populate({
-      path: Permission.name,
-      select: {
-        _id: 1,
-        name: 1,
-        apiPath: 1,
-        method: 1,
-        module: 1,
-      },
+      path: 'permissions',
+      select: 'name apiPath method module',
     });
 
     return role;

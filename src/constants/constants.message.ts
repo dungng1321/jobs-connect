@@ -3,6 +3,7 @@ export const MESSAGE_ERROR = {
   EMAIL_EXIST: 'Email already exist',
   USER_NOT_FOUND: 'User not found',
   DELETE_USER_FAIL: 'Delete user fail',
+  CANNOT_DELETE_ADMIN: 'Cannot delete admin',
 
   // company
   COMPANY_NOT_FOUND: 'Company not found',

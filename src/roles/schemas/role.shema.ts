@@ -15,7 +15,9 @@ export class Role {
   @Prop()
   isActive: boolean;
 
-  @Prop({ type: mongoose.Schema.Types.Array, ref: Permission.name })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: Permission.name }],
+  })
   permissions: Permission[];
 
   // action audit
