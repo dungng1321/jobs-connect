@@ -61,15 +61,14 @@ export class SubscribersController {
   }
 
   //update subscriber by id
-  @Patch(':id')
+  @Patch()
   @ResponseMessage(MESSAGE_SUCCESS.UPDATE_SUBSCRIBER_SUCCESS)
   update(
-    @Param('id') id: string,
     @Body() updateSubscriberDto: UpdateSubscriberDto,
     @RequestUser() user: IUser,
   ) {
     try {
-      return this.subscribersService.update(id, updateSubscriberDto, user);
+      return this.subscribersService.update(updateSubscriberDto, user);
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }

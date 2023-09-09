@@ -10,7 +10,11 @@ import { FormatResponseData } from './middleware/formatResponseData.interceptor'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
 
   // use cookie parser middleware
   app.use(cookieParser());

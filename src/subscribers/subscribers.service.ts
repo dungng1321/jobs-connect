@@ -93,14 +93,9 @@ export class SubscribersService {
 
   // update subscriber by id
   async update(
-    id: string,
     updateSubscriberDto: UpdateSubscriberDto,
     @RequestUser() user: IUser,
   ) {
-    if (!isValidObjectId(id) || !(await this.subscriberModel.findById(id))) {
-      throw new BadRequestException(MESSAGE_ERROR.SUBSCRIBER_NOT_FOUND);
-    }
-
     const { email } = updateSubscriberDto;
 
     const isExist = await this.subscriberModel.findOne({ email });
@@ -109,20 +104,18 @@ export class SubscribersService {
       throw new BadRequestException(MESSAGE_ERROR.EMAIL_EXIST);
     }
 
-    const subscriber = await this.subscriberModel
-      .findByIdAndUpdate(
-        id,
-        {
-          ...updateSubscriberDto,
-          updatedBy: {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-          },
+    const subscriber = await this.subscriberModel.updateOne(
+      { email: user.email },
+      {
+        ...updateSubscriberDto,
+        updatedBy: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
         },
-        { new: true },
-      )
-      .exec();
+      },
+      { upsert: true },
+    );
 
     return subscriber;
   }
