@@ -7,20 +7,24 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import app from 'api-query-params';
+import { JwtService } from '@nestjs/jwt';
 
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
-import { hashPassword } from 'src/util/hashPassword';
+import { comparePassword, hashPassword } from 'src/util/hashPassword';
 import { MESSAGE_ERROR } from 'src/constants/constants.message';
 import { IUser } from './interface/user.interface';
 import { RequestUser } from 'src/decorator/customize';
 import { Position } from 'src/constants/constantsEnum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    private readonly jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   // create new user by admin
@@ -138,6 +142,23 @@ export class UsersService {
     return data;
   }
 
+  // find user by email
+  async findOneByEmail(email: string) {
+    const user = await this.userModel.findOne({ email: email }).populate({
+      path: 'role',
+      select: {
+        name: 1,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const data = user.toObject();
+
+    return data;
+  }
+
   // update user
   async update(
     id: string,
@@ -213,6 +234,55 @@ export class UsersService {
           name: 1,
         },
       });
+
+    return updateData;
+  }
+
+  //  change password
+  async changePassword(id: string, oldPassword: string, newPassword: string) {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new NotFoundException(MESSAGE_ERROR.USER_NOT_FOUND);
+    }
+
+    const isMatch = comparePassword(oldPassword, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Password is not correct');
+    }
+
+    const hashedPassword = hashPassword(newPassword);
+
+    const updateData = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        {
+          password: hashedPassword,
+        },
+        { new: true },
+      )
+      .select('-password');
+
+    return updateData;
+  }
+
+  // reset password with token from url and new password
+  async resetPassword(token: string, newPassword: string) {
+    const decoded = this.jwtService.verify(token, {
+      secret: this.configService.get('JWT_SECRET_FORGOT_PASSWORD'),
+    });
+
+    console.log(decoded);
+
+    const hashedPassword = hashPassword(newPassword);
+    const updateData = await this.userModel
+      .findOneAndUpdate(
+        { email: decoded.email },
+        {
+          password: hashedPassword,
+        },
+        { new: true },
+      )
+      .select('-password');
 
     return updateData;
   }

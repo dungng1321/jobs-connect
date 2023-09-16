@@ -19,4 +19,15 @@ export class MailController {
       throw new HttpException(error.message, error.status);
     }
   }
+
+  @Post('forgot-password')
+  @Public()
+  @ResponseMessage('Send email forgot password successfully')
+  async handleSendEmailForgotPassword(@Body('email') email: string) {
+    try {
+      await this.mailService.sendEmailForgotPassword(email);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+  }
 }

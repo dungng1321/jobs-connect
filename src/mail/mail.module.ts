@@ -10,9 +10,12 @@ import {
   SubscriberSchema,
 } from 'src/subscribers/schemas/subscriber.schema';
 import { Job, JobSchema } from 'src/jobs/schemas/job.shema';
+import { JwtService } from '@nestjs/jwt';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     MailerModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         transport: {
@@ -44,6 +47,6 @@ import { Job, JobSchema } from 'src/jobs/schemas/job.shema';
   ],
 
   controllers: [MailController],
-  providers: [MailService],
+  providers: [MailService, JwtService],
 })
 export class MailModule {}

@@ -16,7 +16,7 @@ import {
   MESSAGE_ERROR,
   MESSAGE_SUCCESS,
 } from 'src/constants/constants.message';
-import { ResponseMessage, RequestUser } from 'src/decorator/customize';
+import { ResponseMessage, RequestUser, Public } from 'src/decorator/customize';
 import { IUser } from './interface/user.interface';
 
 @Controller('users')
@@ -83,6 +83,36 @@ export class UsersController {
       return this.usersService.remove(id, user);
     } catch (err) {
       throw new HttpException(MESSAGE_ERROR.DELETE_USER_FAIL, err.statusCode);
+    }
+  }
+
+  // change password
+  @Post('/change-password/id')
+  @ResponseMessage('change password successfully')
+  async changePassword(
+    @Param('id') id: string,
+    @Body('oldPassword') oldPassword: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    try {
+      return this.usersService.changePassword(id, oldPassword, newPassword);
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
+    }
+  }
+
+  // forgot password
+  @Post('/reset-password')
+  @Public()
+  @ResponseMessage('change password successfully')
+  async forgotPassword(
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    try {
+      return this.usersService.resetPassword(token, newPassword);
+    } catch (error) {
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 }

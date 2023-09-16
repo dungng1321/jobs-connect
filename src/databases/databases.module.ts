@@ -10,6 +10,7 @@ import {
 } from 'src/permissions/schemas/permission.shema';
 import { Role, RoleSchema } from 'src/roles/schemas/role.shema';
 import { UsersService } from 'src/users/users.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   controllers: [DatabasesController],
@@ -20,6 +21,7 @@ import { UsersService } from 'src/users/users.service';
       { name: Permission.name, schema: PermissionSchema },
       { name: Role.name, schema: RoleSchema },
     ]),
+    JwtModule,
   ],
 })
 export class DatabasesModule {}
