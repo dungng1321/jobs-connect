@@ -17,6 +17,7 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 import { IUser } from 'src/users/interface/user.interface';
 import { RolesService } from 'src/roles/roles.service';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +27,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60 } })
   @UseGuards(LocalAuthGuard)
   @ResponseMessage(MESSAGE_SUCCESS.LOGIN_SUCCESS)
   @Post('/login')

@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import helmet from 'helmet';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { FormatResponseData } from './middleware/formatResponseData.interceptor';
 
@@ -43,6 +44,9 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
   const port = configService.get('PORT');
+
+  // config helmet
+  app.use(helmet());
   await app.listen(port);
 }
 bootstrap();
