@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core';
 import helmet from 'helmet';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { FormatResponseData } from './middleware/formatResponseData.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -43,6 +44,26 @@ async function bootstrap() {
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
+
+  // config swagger
+  const config = new DocumentBuilder()
+    .setTitle('Jobs Connect API')
+    .setDescription('The jobs connect API description')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'token',
+    )
+    .addSecurityRequirements('token')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   const port = configService.get('PORT');
 
   // config helmet

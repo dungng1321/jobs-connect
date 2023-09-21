@@ -2,7 +2,9 @@ import { Body, Controller, Get, HttpException, Post } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { Cron } from '@nestjs/schedule';
 import { Public, ResponseMessage } from 'src/decorator/customize';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('mail')
 @Controller('mail')
 export class MailController {
   constructor(private readonly mailService: MailService) {}

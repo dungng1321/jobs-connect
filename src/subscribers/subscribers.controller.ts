@@ -15,7 +15,9 @@ import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { RequestUser, ResponseMessage } from 'src/decorator/customize';
 import { IUser } from 'src/users/interface/user.interface';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('subscribers')
 @Controller('subscribers')
 export class SubscribersController {
   constructor(private readonly subscribersService: SubscribersService) {}

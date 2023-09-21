@@ -14,7 +14,9 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { RequestUser, ResponseMessage } from 'src/decorator/customize';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 import { IUser } from 'src/users/interface/user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('roles')
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

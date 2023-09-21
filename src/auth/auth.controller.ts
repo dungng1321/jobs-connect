@@ -18,7 +18,9 @@ import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
 import { IUser } from 'src/users/interface/user.interface';
 import { RolesService } from 'src/roles/roles.service';
 import { Throttle } from '@nestjs/throttler';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(

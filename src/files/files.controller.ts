@@ -15,7 +15,9 @@ import { FilesService } from './files.service';
 import { ALLOWED_FILE_TYPES } from 'src/constants/constants.common';
 import { ResponseMessage } from 'src/decorator/customize';
 import { MESSAGE_SUCCESS } from 'src/constants/constants.message';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('files')
 @Controller('files')
 export class FilesController {
   constructor(
